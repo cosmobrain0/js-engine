@@ -105,7 +105,6 @@ class CircleRenderer {
 	}
 }
 
-// TODO: Circle Renderer - done
 // TODO: example rectangle button and examlpe circle button
 // TODO: RectangleButton class and CircleButton class
 // TODO: Renderer support for hover effects and images
@@ -155,11 +154,23 @@ class Button {
 }
 
 class Menu {
+	/**
+	 * 
+	 * @param {Vector} position 
+	 * @param {Menu?} parent 
+	 */
 	constructor(position, parent) {
 		this.position = position.copy();
 		// NOTE: add dragging stuff to menu, not button
 		this.parent = parent; // Menu or null
+		/**
+		 * @type {Button[]}
+		 */
 		this.buttons = [];
+		/**
+		 * @type {Menu[]}
+		 */
+		this.menus = [];
 	}
 
 	get hover() {
@@ -170,11 +181,29 @@ class Menu {
 		return this.parent == null ? this.position.copy() : Vector.add(this.parent.globalPosition, this.position);
 	}
 
+	/**
+	 * 
+	 * @param {Button} btn 
+	 */
 	addButton(btn) {
 		this.buttons.push(btn);
 	}
 
+	/**
+	 * 
+	 * @param {Menu} menu 
+	 */
+	addMenu(menu) {
+		this.menus.push(menu);
+	}
+
 	draw() {
-		this.renderer.render();
+		// this.renderer.render();
+		for (let menu of this.menus) {
+			menu.draw();
+		}
+		for (let button of this.buttons) {
+			button.draw();
+		}
 	}
 }
