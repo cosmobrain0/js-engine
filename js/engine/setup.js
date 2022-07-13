@@ -106,6 +106,7 @@ onmousedown = e => {
 onmouseup = e => {
     if (e.button == 0) {
 		Mouse.leftclick.down = false;
+		UI.update();
 	}
     else if (e.button == 2) Mouse.rightclick.down = false;
     // handle end-of-press inputs
