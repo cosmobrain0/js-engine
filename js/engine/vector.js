@@ -131,4 +131,12 @@ class Vector {
     static project(start, projection) {
         return Vector.multiply(projection, Vector.dot(start, projection)/Vector.dot(projection, projection));
     }
+
+    static random(maxX, maxY) {
+        return new Vector(Math.random()*maxX, Math.random()*maxY);
+    }
+
+    static lerp(a, b, t) {
+        return Vector.subtract(b, a).multiply(t).add(a);
+    }
 }
