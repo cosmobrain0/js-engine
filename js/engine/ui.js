@@ -42,6 +42,16 @@ class CircleCollider {
 }
 
 class RectangleRenderer {
+	/**
+	 * 
+	 * @param {Button} parent 
+	 * @param {Number} width 
+	 * @param {Number} height 
+	 * @param {String} bgcolour 
+	 * @param {String} text 
+	 * @param {String} txtcolour 
+	 * @param {String} font 
+	 */
 	constructor(parent, width, height, bgcolour, text, txtcolour, font) {
 		this.parent = parent;
 		this.width = width;
@@ -50,6 +60,7 @@ class RectangleRenderer {
 		this.text = text;
 		this.txtcolour = txtcolour;
 		this.txtsize = txtsize;
+		this.font = font;
 	}
 
 	render() {
@@ -62,10 +73,43 @@ class RectangleRenderer {
 	}
 }
 
-// TODO: Circle Renderer
+class CircleRenderer {
+	/**
+	 * 
+	 * @param {Button} parent 
+	 * @param {Number} radius 
+	 * @param {String} bgcolour 
+	 * @param {String} text 
+	 * @param {String} txtcolour 
+	 * @param {String} font 
+	 */
+	constructor(parent, radius, bgcolour, text, txtcolour, font) {
+		this.parent = parent;
+		this.radius = radius;
+		this.bgcolour = bgcolour;
+		this.text = text;
+		this.txtcolour = txtcolour;
+		this.txtsize = txtsize;
+		this.font = font;
+	}
+
+	render() {
+		let position = this.parent.globalPosition;
+		fillStyle(this.bgcolour);
+		beginPath();
+		arc(position.x, position.y, this.radius, 0, 2*PI);
+		fill();
+		fillStyle(this.txtcolour);
+		font(this.font);
+		fillText(position.x+position.width*0.1, position.y+position.height-position.height*0.1);
+	}
+}
+
+// TODO: Circle Renderer - done
 // TODO: example rectangle button and examlpe circle button
 // TODO: RectangleButton class and CircleButton class
 // TODO: Renderer support for hover effects and images
+// TODO: Refactor
 
 /**
  * @typedef {RectangleCollider|CircleCollider} Collider
