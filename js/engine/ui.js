@@ -16,7 +16,8 @@ class RectangleCollider {
 	 * @returns {boolean} if the point is over this collider
 	 */
 	intersects(position) {
-		return false;
+		let pos = this.parent.globalPosition;
+		return inRange(position.x, pos.x, pos.x+this.size.x) && inRange(position.y, pos.y, pos.y+this.size.y);
 	}
 }
 
@@ -59,7 +60,6 @@ class RectangleRenderer {
 		this.bgcolour = bgcolour;
 		this.text = text;
 		this.txtcolour = txtcolour;
-		this.txtsize = txtsize;
 		this.font = font;
 	}
 
@@ -69,7 +69,7 @@ class RectangleRenderer {
 		fillRect(position.x, position.y, this.width, this.height);
 		fillStyle(this.txtcolour);
 		font(this.font);
-		fillText(position.x+position.width*0.1, position.y+position.height-position.height*0.1);
+		fillText(this.text, position.x+this.width*0.1, position.y+this.height-this.height*0.1);
 	}
 }
 
@@ -105,7 +105,6 @@ class CircleRenderer {
 	}
 }
 
-// TODO: example rectangle button and examlpe circle button
 // TODO: RectangleButton class and CircleButton class
 // TODO: Renderer support for hover effects and images
 // TODO: Refactor
@@ -187,6 +186,7 @@ class Menu {
 	 */
 	addButton(btn) {
 		this.buttons.push(btn);
+		btn.parent = this;
 	}
 
 	/**
@@ -195,6 +195,14 @@ class Menu {
 	 */
 	addMenu(menu) {
 		this.menus.push(menu);
+		menu.parent = this;
+	}
+
+	update() {
+		for (let button of this.buttons) {
+			if (button.hover) button.click();
+		}
+		for (let menu of this.menus) menu.update();
 	}
 
 	draw() {
