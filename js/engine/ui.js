@@ -38,7 +38,7 @@ class CircleCollider {
 	 * @returns {boolean} if the point is over this collider
 	 */
 	intersects(position) {
-		return false;
+		return position.to(this.parent.globalPosition).sqrLength() < this.radius*this.radius;
 	}
 }
 
@@ -89,7 +89,6 @@ class CircleRenderer {
 		this.bgcolour = bgcolour;
 		this.text = text;
 		this.txtcolour = txtcolour;
-		this.txtsize = txtsize;
 		this.font = font;
 	}
 
@@ -101,11 +100,10 @@ class CircleRenderer {
 		fill();
 		fillStyle(this.txtcolour);
 		font(this.font);
-		fillText(position.x+position.width*0.1, position.y+position.height-position.height*0.1);
+		fillText(this.text, position.x-this.radius*0.8, position.y+this.radius*0.4);
 	}
 }
 
-// TODO: RectangleButton class and CircleButton class
 // TODO: Renderer support for hover effects and images
 // TODO: Refactor
 
@@ -116,7 +114,7 @@ class CircleRenderer {
 class Button {
 	/**
 	 * 
-	 * @param {Menu} parent 
+	 * @param {Menu?} parent 
 	 * @param {Vector} position 
 	 * @param {Collider} collider
 	 * @param {Renderer} renderer
@@ -131,6 +129,7 @@ class Button {
 		this.callbacks = callbacks;
 		this.position = position.copy();
 		this.parent = parent; // a menu
+		if (this.parent) this.parent.addButton(this);
 	}
 
 	get hover() {
@@ -162,6 +161,7 @@ class Menu {
 		this.position = position.copy();
 		// NOTE: add dragging stuff to menu, not button
 		this.parent = parent; // Menu or null
+		if (this.parent) this.parent.addMenu(this);
 		/**
 		 * @type {Button[]}
 		 */
@@ -185,7 +185,7 @@ class Menu {
 	 * @param {Button} btn 
 	 */
 	addButton(btn) {
-		this.buttons.push(btn);
+		if (!this.buttons.includes(btn)) this.buttons.push(btn);
 		btn.parent = this;
 	}
 
@@ -194,7 +194,7 @@ class Menu {
 	 * @param {Menu} menu 
 	 */
 	addMenu(menu) {
-		this.menus.push(menu);
+		if (!this.menus.includes(menu)) this.menus.push(menu);
 		menu.parent = this;
 	}
 
@@ -214,4 +214,36 @@ class Menu {
 			button.draw();
 		}
 	}
+}
+
+/**
+ * 
+ * @param {Menu?} parent 
+ * @param {Number} x 
+ * @param {Number} y 
+ * @param {Number} width 
+ * @param {Number} height 
+ * @param {String} bgcolour 
+ * @param {String} text 
+ * @param {String} txtcolour 
+ * @param {String} font 
+ * @param {Function[]} callbacks 
+ * @returns {Button} a button with a RectangleCollider and RectangleRenderer
+ */
+const RectangleButton = (parent, x, y, width, height, bgcolour, text, txtcolour, font, callbacks) => {
+	return new Button(
+		parent, new Vector(x, y),
+		new RectangleCollider(null, width, height),
+		new RectangleRenderer(null, width, height, bgcolour, text, txtcolour, font),
+		callbacks
+	);
+}
+
+const CircleButton = (parent, x, y, radius, bgcolour, text, txtcolour, font, callbacks) => {
+	return new Button(
+		parent, new Vector(x, y),
+		new CircleCollider(null, radius),
+		new CircleRenderer(null, radius, bgcolour, text, txtcolour, font),
+		callbacks
+	);
 }

@@ -130,7 +130,3 @@ onwheel = e => {
     // e.deltaY
 	for (let f of events.wheel) f(e.deltaY);
 }
-
-let getAllButtonList = () => {
-	
-}
