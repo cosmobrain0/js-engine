@@ -128,8 +128,6 @@ const UI_RENDERERS = {};
 	Object.freeze(UI_RENDERERS);
 })();
 
-// TODO: Refactor
-
 /**
  * @typedef {UI_COLLIDERS.RectangleCollider|UI_COLLIDERS.CircleCollider} Collider
  */
