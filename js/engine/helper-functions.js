@@ -39,7 +39,6 @@ let adjustSize = () => {
     c.style.left = `${(window.innerWidth - width) / 2}px`;
     c.style.top = `${(window.innerHeight - height) / 2}px`;
     ctx.scale(width / CANVASWIDTH, height / CANVASHEIGHT);
-    maxLength = Math.sqrt(c.width * c.width + c.height * c.height) / 2;
 }
 
 /**

@@ -1,114 +1,137 @@
-class RectangleCollider {
-	/**
-	 * 
-	 * @param {Button} parent 
-	 * @param {Number} width 
-	 * @param {Number} height 
-	 */
-	constructor(parent, width, height) {
-		this.parent = parent;
-		this.size = new Vector(width, height);
+const UI_COLLIDERS = {};
+const UI_RENDERERS = {};
+
+(() => {
+	class RectangleCollider {
+		/**
+		 * 
+		 * @param {Button} parent 
+		 * @param {Number} width 
+		 * @param {Number} height 
+		 */
+		constructor(parent, width, height) {
+			this.parent = parent;
+			this.size = new Vector(width, height);
+		}
+	
+		/**
+		 * 
+		 * @param {Vector} position the point to test
+		 * @returns {boolean} if the point is over this collider
+		 */
+		intersects(position) {
+			let pos = this.parent.globalPosition;
+			return inRange(position.x, pos.x, pos.x+this.size.x) && inRange(position.y, pos.y, pos.y+this.size.y);
+		}
+	}
+	
+	class CircleCollider {
+		/**
+		 * 
+		 * @param {Button} parent 
+		 * @param {Number} radius 
+		 */
+		constructor(parent, radius) {
+			this.parent = parent;
+			this.radius = radius;
+		}
+	
+		/**
+		 * 
+		 * @param {Vector} position the point to test
+		 * @returns {boolean} if the point is over this collider
+		 */
+		intersects(position) {
+			return position.to(this.parent.globalPosition).sqrLength() < this.radius*this.radius;
+		}
+	}
+	
+	class RectangleRenderer {
+		/**
+		 * 
+		 * @param {Button} parent 
+		 * @param {Number} width 
+		 * @param {Number} height 
+		 * @param {String} bgcolour 
+		 * @param {String} text 
+		 * @param {String} txtcolour 
+		 * @param {String} font 
+		 */
+		constructor(parent, width, height, bgcolour, hoverbg, text, txtcolour, font) {
+			this.parent = parent;
+			this.width = width;
+			this.height = height;
+			this.bgcolour = bgcolour;
+			this.hoverbg = hoverbg;
+			this.text = text;
+			this.txtcolour = txtcolour;
+			this.font = font;
+		}
+	
+		render() {
+			let position = this.parent.globalPosition;
+			fillStyle(this.bgcolour);
+			fillRect(position.x, position.y, this.width, this.height);
+			if (this.parent.hover) {
+				fillStyle(this.hoverbg);
+				fillRect(position.x, position.y, this.width, this.height);
+			}
+			fillStyle(this.txtcolour);
+			font(this.font);
+			fillText(this.text, position.x+this.width*0.1, position.y+this.height-this.height*0.1);
+		}
+	}
+	
+	class CircleRenderer {
+		/**
+		 * 
+		 * @param {Button} parent 
+		 * @param {Number} radius 
+		 * @param {String} bgcolour 
+		 * @param {String} hoverbg
+		 * @param {String} text 
+		 * @param {String} txtcolour 
+		 * @param {String} font 
+		 */
+		constructor(parent, radius, bgcolour, hoverbg, text, txtcolour, font) {
+			this.parent = parent;
+			this.radius = radius;
+			this.bgcolour = bgcolour;
+			this.hoverbg = hoverbg;
+			this.text = text;
+			this.txtcolour = txtcolour;
+			this.font = font;
+		}
+	
+		render() {
+			let position = this.parent.globalPosition;
+			fillStyle(this.bgcolour);
+			beginPath();
+			arc(position.x, position.y, this.radius, 0, 2*PI);
+			fill();
+			if (this.parent.hover) {
+				fillStyle(this.hoverbg);
+				beginPath();
+				arc(position.x, position.y, this.radius, 0, 2*PI);
+				fill();
+			}
+			fillStyle(this.txtcolour);
+			font(this.font);
+			fillText(this.text, position.x-this.radius*0.8, position.y+this.radius*0.4);
+		}
 	}
 
-	/**
-	 * 
-	 * @param {Vector} position the point to test
-	 * @returns {boolean} if the point is over this collider
-	 */
-	intersects(position) {
-		let pos = this.parent.globalPosition;
-		return inRange(position.x, pos.x, pos.x+this.size.x) && inRange(position.y, pos.y, pos.y+this.size.y);
-	}
-}
+	UI_COLLIDERS.RectangleCollider = RectangleCollider;
+	UI_COLLIDERS.CircleCollider = CircleCollider;
+	UI_RENDERERS.RectangleRenderer = RectangleRenderer;
+	UI_RENDERERS.CircleRenderer = CircleRenderer;
+	Object.freeze(UI_RENDERERS);
+})();
 
-class CircleCollider {
-	/**
-	 * 
-	 * @param {Button} parent 
-	 * @param {Number} radius 
-	 */
-	constructor(parent, radius) {
-		this.parent = parent;
-		this.radius = radius;
-	}
-
-	/**
-	 * 
-	 * @param {Vector} position the point to test
-	 * @returns {boolean} if the point is over this collider
-	 */
-	intersects(position) {
-		return position.to(this.parent.globalPosition).sqrLength() < this.radius*this.radius;
-	}
-}
-
-class RectangleRenderer {
-	/**
-	 * 
-	 * @param {Button} parent 
-	 * @param {Number} width 
-	 * @param {Number} height 
-	 * @param {String} bgcolour 
-	 * @param {String} text 
-	 * @param {String} txtcolour 
-	 * @param {String} font 
-	 */
-	constructor(parent, width, height, bgcolour, text, txtcolour, font) {
-		this.parent = parent;
-		this.width = width;
-		this.height = height;
-		this.bgcolour = bgcolour;
-		this.text = text;
-		this.txtcolour = txtcolour;
-		this.font = font;
-	}
-
-	render() {
-		let position = this.parent.globalPosition;
-		fillStyle(this.bgcolour);
-		fillRect(position.x, position.y, this.width, this.height);
-		fillStyle(this.txtcolour);
-		font(this.font);
-		fillText(this.text, position.x+this.width*0.1, position.y+this.height-this.height*0.1);
-	}
-}
-
-class CircleRenderer {
-	/**
-	 * 
-	 * @param {Button} parent 
-	 * @param {Number} radius 
-	 * @param {String} bgcolour 
-	 * @param {String} text 
-	 * @param {String} txtcolour 
-	 * @param {String} font 
-	 */
-	constructor(parent, radius, bgcolour, text, txtcolour, font) {
-		this.parent = parent;
-		this.radius = radius;
-		this.bgcolour = bgcolour;
-		this.text = text;
-		this.txtcolour = txtcolour;
-		this.font = font;
-	}
-
-	render() {
-		let position = this.parent.globalPosition;
-		fillStyle(this.bgcolour);
-		beginPath();
-		arc(position.x, position.y, this.radius, 0, 2*PI);
-		fill();
-		fillStyle(this.txtcolour);
-		font(this.font);
-		fillText(this.text, position.x-this.radius*0.8, position.y+this.radius*0.4);
-	}
-}
-
-// TODO: Renderer support for hover effects and images
 // TODO: Refactor
 
 /**
- * @typedef {RectangleCollider|CircleCollider} Collider
+ * @typedef {UI_COLLIDERS.RectangleCollider|UI_COLLIDERS.CircleCollider} Collider
  */
 
 class Button {
@@ -215,7 +238,6 @@ class Menu {
 		}
 	}
 }
-
 /**
  * 
  * @param {Menu?} parent 
@@ -224,26 +246,41 @@ class Menu {
  * @param {Number} width 
  * @param {Number} height 
  * @param {String} bgcolour 
+ * @param {String} hoverbg
  * @param {String} text 
  * @param {String} txtcolour 
  * @param {String} font 
  * @param {Function[]} callbacks 
- * @returns {Button} a button with a RectangleCollider and RectangleRenderer
+ * @returns {Button} a button with a `UI_COLLIDERS.RectangleCollider` and `UI_RENDERERS.RectangleRenderer`
  */
-const RectangleButton = (parent, x, y, width, height, bgcolour, text, txtcolour, font, callbacks) => {
+const RectangleButton = (parent, x, y, width, height, bgcolour, hoverbg, text, txtcolour, font, callbacks) => {
 	return new Button(
 		parent, new Vector(x, y),
-		new RectangleCollider(null, width, height),
-		new RectangleRenderer(null, width, height, bgcolour, text, txtcolour, font),
+		new UI_COLLIDERS.RectangleCollider(null, width, height),
+		new UI_RENDERERS.RectangleRenderer(null, width, height, bgcolour, hoverbg, text, txtcolour, font),
 		callbacks
 	);
 }
 
-const CircleButton = (parent, x, y, radius, bgcolour, text, txtcolour, font, callbacks) => {
+/**
+ * 
+ * @param {Menu?} parent 
+ * @param {Number} x 
+ * @param {Number} y 
+ * @param {Number} radius 
+ * @param {String} bgcolour 
+ * @param {String} hoverbg 
+ * @param {String} text 
+ * @param {String} txtcolour 
+ * @param {String} font 
+ * @param {Function[]} callbacks 
+ * @returns {Button} a button with a `UI_COLLIDERS.CircleCollider` and a `UI_RENDERERS.CircleRenderer`
+ */
+const CircleButton = (parent, x, y, radius, bgcolour, hoverbg, text, txtcolour, font, callbacks) => {
 	return new Button(
 		parent, new Vector(x, y),
-		new CircleCollider(null, radius),
-		new CircleRenderer(null, radius, bgcolour, text, txtcolour, font),
+		new UI_COLLIDERS.CircleCollider(null, radius),
+		new UI_RENDERERS.CircleRenderer(null, radius, bgcolour, hoverbg, text, txtcolour, font),
 		callbacks
 	);
 }
