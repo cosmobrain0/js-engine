@@ -78,7 +78,8 @@ const UI_RENDERERS = {};
 			}
 			fillStyle(this.txtcolour);
 			font(this.font);
-			fillText(this.text, position.x+this.width*0.1, position.y+this.height-this.height*0.1);
+			let textDetails = ctx.measureText(this.text);
+			fillText(this.text, position.x-textDetails.width/2 + this.width/2, position.y+(textDetails.actualBoundingBoxAscent+textDetails.actualBoundingBoxDescent)/2 + this.height/2);
 		}
 	}
 	
@@ -117,7 +118,8 @@ const UI_RENDERERS = {};
 			}
 			fillStyle(this.txtcolour);
 			font(this.font);
-			fillText(this.text, position.x-this.radius*0.8, position.y+this.radius*0.4);
+			let textDetails = ctx.measureText(this.text);
+			fillText(this.text, position.x-textDetails.width/2, position.y+(textDetails.actualBoundingBoxAscent+textDetails.actualBoundingBoxDescent)/2);
 		}
 	}
 

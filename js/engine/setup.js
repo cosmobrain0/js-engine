@@ -48,7 +48,13 @@ let leftDrag = () => Vector.subtract(Mouse.position, Mouse.leftclickstart);
 let rightDrag = () => Vector.subtract(Mouse.position, Mouse.rightclickstart);
 const UI = new Menu(new Vector(0, 0), null);
 let keymap = {};
-let previousFrameTime, currentFrameTime, deltaTime;
+let previousFrameTime, currentFrameTime, lastDeltaTime, deltaTime;
+const { Engine, Render, Runner, Bodies, Body, Composite } = Matter;
+/**
+ * @type {Engine}
+ */
+let engine; // physics engine
+let paused = false;
 
 let init = () => false;
 let calc = () => false;
@@ -64,6 +70,8 @@ let events = {
 }
 
 window.onload = () => {
+	engine = Engine.create();
+	paused = false;
 	init();
     requestAnimationFrame(main);
 	previousFrameTime = Date.now();
@@ -71,8 +79,22 @@ window.onload = () => {
 
 let main = () => {
 	currentFrameTime = Date.now();
+	lastDeltaTime = deltaTime == null ? 1 : deltaTime;
 	deltaTime = currentFrameTime - previousFrameTime;
-	calc();
+	if (!paused) {
+		let totalTimeRequired = deltaTime;
+		let previousX = lastDeltaTime%10;
+		if (previousX == 0) previousX = 10;
+		let currentX = 0;
+		let totalTimeDone = 0;
+		while (totalTimeDone < totalTimeRequired) {
+			currentX = min(totalTimeRequired-totalTimeDone, 10);
+			Engine.update(engine, currentX, currentX/previousX);
+			totalTimeDone += currentX;
+			previousX = currentX;
+		}
+		calc();
+	}
 	previousFrameTime = currentFrameTime;
     ctx.clearRect(0, 0, c.width, c.height);
     adjustSize();
