@@ -19,6 +19,7 @@ ctx.imageSmoothingEnabled = false;
  * @property {boolean} down true while this button is pressed
  * @property {Vector} start the position of the mouse the last time it was pressed
  * @property {Vector[]} path the path the mouse took the last time this button was held down
+ * @property {Number?} identifier the identifier for touch input
  */
 /**
  * @typedef {Object} Mouse
@@ -26,6 +27,7 @@ ctx.imageSmoothingEnabled = false;
  * @property {MouseButton} leftclick information about the mouse left click button
  * @property {MouseButton} rightclick information about the mouse right click button
  * @property {Menu} selected the current selected menu
+ * @property {MouseButton[]} touches
  */
 /**
  * @type {Mouse}
@@ -42,7 +44,8 @@ const Mouse = {
 		start: new Vector(0, 0),
 		path: [],
 	},
-	selected: null
+	selected: null,
+	touches: []
 };
 let leftDrag = () => Vector.subtract(Mouse.position, Mouse.leftclickstart);
 let rightDrag = () => Vector.subtract(Mouse.position, Mouse.rightclickstart);
@@ -151,4 +154,51 @@ onkeydown = e => {
 onwheel = e => {
     // e.deltaY
 	for (let f of events.wheel) f(e.deltaY);
+}
+
+ontouchstart = e => {
+	for (let i=0; i<e.touches.length; i++) {
+		/**
+		 * @type {MouseButton}
+		 */
+		let touch = {};
+		touch.down = true;
+		touch.start = adjustMousePosition(e.touches[i].clientX, e.touches[i].clientY);
+		touch.path = [touch.start.copy()];
+		touch.identifier = e.touches[i].identifier;
+		let previousTouch = Mouse.touches.filter(x => x.identifier == touch.identifier);
+		if (previousTouch[0]) {
+			Mouse.touches[Mouse.touches.indexOf(previousTouch[0])] = touch;
+		} else {
+			Mouse.touches.push(touch);
+		}
+	}
+}
+ontouchmove = e => {
+	for (let i=0; i < e.changedTouches.length; i++) {
+		Mouse.touches.forEach(x => {
+			if (e.changedTouches[i].identifier == x.identifier) {
+				let pos = adjustMousePosition(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
+				x.path.push(pos.copy());
+			}
+		})
+	}
+}
+ontouchcancel = e => {
+	for (let i=0; i<e.changedTouches.length; i++) {
+		for (let j=Mouse.touches.length-1; j>=0; j--) {
+			if (e.changedTouches[i].identifier == Mouse.touches[j].identifier) {
+				Mouse.touches[j].down = false;
+			}
+		}
+	}
+}
+ontouchend = e => {
+	for (let i=0; i<e.changedTouches.length; i++) {
+		for (let j=Mouse.touches.length-1; j>=0; j--) {
+			if (e.changedTouches[i].identifier == Mouse.touches[j].identifier) {
+				Mouse.touches[j].down = false;
+			}
+		}
+	}
 }

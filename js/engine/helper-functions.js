@@ -114,3 +114,55 @@ let isRangeOverlapUnordered = (range1boundary1, range1boundary2, range2boundary1
     let overlap = rangeOverlapUnordered(range1boundary1, range1boundary2, range2boundary1, range2boundary2);
     return overlap[0] < overlap[1];
 }
+
+/**
+ * lerp is a funny word
+ * @param {Number} a 
+ * @param {Number} b 
+ * @param {Number} t [0-1] inclusive
+ * @returns the result of linearly interpolating between a and b, based on t
+ */
+let lerp = (a, b, t) => (b-a)*t + a;
+
+/**
+  * returns `x` linearly mapped from the range `[min1-max1]` to the range `[min2-max2]`
+  * +
+  * @param {Number} x the number to map
+  * @param {Number} min1 the lower bound of the input range
+  * @param {Number} max1 the upper bound of the input range
+  * @param {Number} min2 the lower bound of the target range
+  * @param {Number} max2 the upper bound of the target range
+  * @returns {Number}
+  */
+let map = (x, min1, max1, min2, max2) => (x-min1)/(max1-min1) * (max2-min2) + min2;
+
+/**
+  * 
+  * @param {Vector} position of the centre of the circle
+  * @param {Number} r radius
+  * @param {Number?} startAngle in rotations, not radians
+  * @param {Number?} endAngle in rotations, not radians
+  * @param {boolean?} shouldFill 
+  * @param {boolean?} shouldStroke 
+  */
+let circle = (position, r, shouldFill=false, shouldStroke=false) => {
+    beginPath();
+    arc(position, r, 0, 2*PI);
+    if (shouldFill) fill();
+    if (shouldStroke) stroke();
+}
+
+let randomPointInRectangle = (x, y, width, height) => {
+    let value = random()*(2*width + 2*height);
+    if (value < width) {
+        return new Vector(x+value, y);
+    }
+    if (value < 2*width) {
+        return new Vector(x+value - width, y+height);
+    }
+    value -= 2*width;
+    if (value < height) {
+        return new Vector(x, y+value);
+    }
+    return new Vector(x, y+value - width);
+}
