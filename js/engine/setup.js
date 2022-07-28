@@ -38,11 +38,13 @@ const Mouse = {
 		down: false,
 		start: new Vector(0, 0),
 		path: [],
+		identifier: null,
 	},
 	rightclick: {
 		down: false,
 		start: new Vector(0, 0),
 		path: [],
+		identifier: null,
 	},
 	selected: null,
 	touches: []
