@@ -71,8 +71,8 @@ class Vector {
     setPolar(theta = 0, length = 0) {
         /*this.theta = theta;
         this.length = length;*/
-        this.x = cos(theta)*length;
-        this.y = sin(theta)*length;
+        this.x = Math.cos(theta)*length;
+        this.y = Math.sin(theta)*length;
         return this;
     }
 

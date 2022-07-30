@@ -146,14 +146,14 @@ let map = (x, min1, max1, min2, max2) => (x-min1)/(max1-min1) * (max2-min2) + mi
   * @param {boolean?} shouldStroke 
   */
 let circle = (position, r, shouldFill=false, shouldStroke=false) => {
-    beginPath();
-    arc(position, r, 0, 2*PI);
-    if (shouldFill) fill();
-    if (shouldStroke) stroke();
+    ctx.beginPath();
+    ctx.arc(position.x, position.y, r, 0, 2*PI);
+    if (shouldFill) ctx.fill();
+    if (shouldStroke) ctx.stroke();
 }
 
-let randomPointInRectangle = (x, y, width, height) => {
-    let value = random()*(2*width + 2*height);
+let randomPointOnRectangle = (x, y, width, height) => {
+    let value = Math.random()*(2*width + 2*height);
     if (value < width) {
         return new Vector(x+value, y);
     }
