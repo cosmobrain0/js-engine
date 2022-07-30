@@ -71,8 +71,8 @@ class Vector {
     setPolar(theta = 0, length = 0) {
         /*this.theta = theta;
         this.length = length;*/
-        this.x = cos(theta)*length;
-        this.y = sin(theta)*length;
+        this.x = Math.cos(theta)*length;
+        this.y = Math.sin(theta)*length;
         return this;
     }
 
@@ -276,10 +276,10 @@ class Vector {
     }
 
     static inBounds(v, minBound, maxBound) {
-        return inRange(v.x, minBound.x, maxBound.x) && inRange(v.y, minBound.y, maxBound.y);
+        return Utility.inRange(v.x, minBound.x, maxBound.x) && Utility.inRange(v.y, minBound.y, maxBound.y);
     }
 
     static inBoundsUnordered(v, bound1, bound2) {
-        return inRangeUnordered(v.x, bound1.x, bound2.x) && inRangeUnordered(v.y, bound1.y, bound2.y);
+        return Utility.inRangeUnordered(v.x, bound1.x, bound2.x) && Utility.inRangeUnordered(v.y, bound1.y, bound2.y);
     }
 }

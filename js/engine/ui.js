@@ -21,7 +21,7 @@ const UI_RENDERERS = {};
 		 */
 		intersects(position) {
 			let pos = this.parent.globalPosition;
-			return inRange(position.x, pos.x, pos.x+this.size.x) && inRange(position.y, pos.y, pos.y+this.size.y);
+			return Utility.inRange(position.x, pos.x, pos.x+this.size.x) && Utility.inRange(position.y, pos.y, pos.y+this.size.y);
 		}
 	}
 	
@@ -70,16 +70,16 @@ const UI_RENDERERS = {};
 	
 		render() {
 			let position = this.parent.globalPosition;
-			fillStyle(this.bgcolour);
-			fillRect(position.x, position.y, this.width, this.height);
+			ctx.fillStyle = this.bgcolour;
+			ctx.fillRect(position.x, position.y, this.width, this.height);
 			if (this.parent.hover) {
-				fillStyle(this.hoverbg);
-				fillRect(position.x, position.y, this.width, this.height);
+				ctx.fillStyle = this.hoverbg;
+				ctx.fillRect(position.x, position.y, this.width, this.height);
 			}
-			fillStyle(this.txtcolour);
-			font(this.font);
+			ctx.fillStyle = this.txtcolour;
+			ctx.font = this.font;
 			let textDetails = ctx.measureText(this.text);
-			fillText(this.text, position.x-textDetails.width/2 + this.width/2, position.y+(textDetails.actualBoundingBoxAscent+textDetails.actualBoundingBoxDescent)/2 + this.height/2);
+			ctx.fillText(this.text, position.x-textDetails.width/2 + this.width/2, position.y+(textDetails.actualBoundingBoxAscent+textDetails.actualBoundingBoxDescent)/2 + this.height/2);
 		}
 	}
 	
@@ -106,20 +106,20 @@ const UI_RENDERERS = {};
 	
 		render() {
 			let position = this.parent.globalPosition;
-			fillStyle(this.bgcolour);
-			beginPath();
-			arc(position.x, position.y, this.radius, 0, 2*PI);
-			fill();
+			ctx.fillStyle = this.bgcolour;
+			ctx.beginPath();
+			ctx.arc(position.x, position.y, this.radius, 0, 2*Math.PI);
+			ctx.fill();
 			if (this.parent.hover) {
-				fillStyle(this.hoverbg);
-				beginPath();
-				arc(position.x, position.y, this.radius, 0, 2*PI);
-				fill();
+				ctx.fillStyle= this.hoverbg;
+				ctx.beginPath();
+				ctx.arc(position.x, position.y, this.radius, 0, 2*Math.PI);
+				ctx.fill();
 			}
-			fillStyle(this.txtcolour);
-			font(this.font);
+			ctx.fillStyle = this.txtcolour;
+			ctx.font = this.font;
 			let textDetails = ctx.measureText(this.text);
-			fillText(this.text, position.x-textDetails.width/2, position.y+(textDetails.actualBoundingBoxAscent+textDetails.actualBoundingBoxDescent)/2);
+			ctx.fillText(this.text, position.x-textDetails.width/2, position.y+(textDetails.actualBoundingBoxAscent+textDetails.actualBoundingBoxDescent)/2);
 		}
 	}
 
@@ -156,7 +156,7 @@ class Button {
 	}
 
 	get hover() {
-		return this.collider.intersects(Mouse.position);
+		return this.collider.intersects(Input.mouse.position);
 	}
 
 	get globalPosition() {
@@ -196,7 +196,7 @@ class Menu {
 	}
 
 	get hover() {
-		return this.collider.intersects(Mouse.position);
+		return this.collider.intersects(Input.mouse.position);
 	}
 
 	get globalPosition() {
