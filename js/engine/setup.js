@@ -48,29 +48,51 @@ class MouseButton {
  * @property {MouseButton[]} touches
  */
 /**
- * @type {Mouse}
+ * @property {Mouse} Mouse information regarding mouse / touch input
+ * @property {Object} keymap shows which keys are currently pressed
  */
-const Mouse = {
-	position: new Vector(0, 0),
-	leftclick: new MouseButton(new Vector(0, 0), false),
-	rightclick: new MouseButton(new Vector(0, 0), false),
-	selected: null,
-	touches: []
-};
+const Input = {
+	mouse:	{
+		position: new Vector(0, 0),
+		leftclick: new MouseButton(new Vector(0, 0), false),
+		rightclick: new MouseButton(new Vector(0, 0), false),
+		selected: null,
+		touches: []
+	},
+	keymap: {}
+}
 const UI = new Menu(new Vector(0, 0), null);
-let keymap = {};
-let previousFrameTime, currentFrameTime, lastDeltaTime, deltaTime;
-const { Engine, Render, Runner, Bodies, Body, Composite } = Matter;
+const Time = {
+	previousFrameTime: null,
+	currentFrameTime: null,
+	lastDeltaTime: null,
+	deltaTime: null
+};
 /**
- * @type {Engine}
+ * @type {Matter.Engine}
  */
-let engine; // physics engine
+let physicsEngine; // physics engine
+/**
+ * set this to true to stop calc() being called
+ */
 let paused = false;
 
 let init = () => false;
 let calc = () => false;
 let draw = () => false;
 
+/**
+ * @property {Function[]} mousemove
+ * @property {Function[]} mousedown
+ * @property {Function[]} mouseup
+ * @property {Function[]} keydown
+ * @property {Function[]} keyup
+ * @property {Function[]} wheel
+ * @property {Function[]} touchstart
+ * @property {Function[]} touchmove
+ * @property {Function[]} touchcancel
+ * @property {Function[]} touchend
+ */
 let events = {
 	mousemove  : [],
 	mousedown  : [],
@@ -85,78 +107,78 @@ let events = {
 }
 
 window.onload = () => {
-	engine = Engine.create();
+	physicsEngine = Matter.Engine.create();
 	paused = false;
 	init();
     requestAnimationFrame(main);
-	previousFrameTime = Date.now();
+	Time.previousFrameTime = Date.now();
 }
 
 let main = () => {
-	currentFrameTime = Date.now();
-	lastDeltaTime = deltaTime == null ? 1 : deltaTime;
-	deltaTime = currentFrameTime - previousFrameTime;
+	Time.currentFrameTime = Date.now();
+	Time.lastDeltaTime = Time.deltaTime == null ? 1 : Time.deltaTime;
+	Time.deltaTime = Time.currentFrameTime - Time.previousFrameTime;
 	if (!paused) {
-		let totalTimeRequired = deltaTime;
-		let previousX = lastDeltaTime%10;
+		let totalTimeRequired = Time.deltaTime;
+		let previousX = Time.lastDeltaTime%10;
 		if (previousX == 0) previousX = 10;
 		let currentX = 0;
 		let totalTimeDone = 0;
 		while (totalTimeDone < totalTimeRequired) {
 			currentX = min(totalTimeRequired-totalTimeDone, 10);
-			Engine.update(engine, currentX, currentX/previousX);
+			Matter.Engine.update(physicsEngine, currentX, currentX/previousX);
 			totalTimeDone += currentX;
 			previousX = currentX;
 		}
 		calc();
 	}
-	previousFrameTime = currentFrameTime;
+	Time.previousFrameTime = Time.currentFrameTime;
     ctx.clearRect(0, 0, c.width, c.height);
-    adjustSize();
+    Utility.adjustSize();
 	draw();
 	UI.draw();
     requestAnimationFrame(main);
 }
 
 onmousemove = e => {
-	Mouse.position = adjustMousePosition(e.clientX, e.clientY);
-	if (Mouse.leftclick.down) Mouse.leftclick.path.push(Mouse.position.copy());
-	if (Mouse.rightclick.down) Mouse.rightclick.path.push(Mouse.position.copy());
+	Input.mouse.position = Utility.adjustMousePosition(e.clientX, e.clientY);
+	if (Input.mouse.leftclick.down) Input.mouse.leftclick.path.push(Input.mouse.position.copy());
+	if (Input.mouse.rightclick.down) Input.mouse.rightclick.path.push(Input.mouse.position.copy());
 	for (let f of events.mousemove) f(e);
 }
 onmousedown = e => {
     if (e.button == 0) {
-		Mouse.leftclick.down = true;
-		Mouse.leftclick.start = Mouse.position.copy();
-		Mouse.leftclick.path = [Mouse.position.copy()];
-		Mouse.selected = null;
+		Input.mouse.leftclick.down = true;
+		Input.mouse.leftclick.start = Input.mouse.position.copy();
+		Input.mouse.leftclick.path = [Input.mouse.position.copy()];
+		Input.mouse.selected = null;
 		
 	}
     else if (e.button == 2) {
-		Mouse.rightclick.down = true;
-		Mouse.rightclick.start = Mouse.position.copy();
-		Mouse.rightclick.path = [Mouse.position.copy()];
+		Input.mouse.rightclick.down = true;
+		Input.mouse.rightclick.start = Input.mouse.position.copy();
+		Input.mouse.rightclick.path = [Input.mouse.position.copy()];
 	}
 	for (let f of events.mousedown) f(e);
 }
 onmouseup = e => {
     if (e.button == 0) {
-		Mouse.leftclick.down = false;
+		Input.mouse.leftclick.down = false;
 		UI.update();
 	}
-    else if (e.button == 2) Mouse.rightclick.down = false;
+    else if (e.button == 2) Input.mouse.rightclick.down = false;
 	for (let f of events.mouseup) f(e);
 }
 oncontextmenu = e => e.preventDefault(); // custom context menus?
 
 onkeyup = e => {
-    keymap[e.key] = false;
+    Input.keymap[e.key] = false;
     // handle any one-time-per-key-press inputs
 	for (let f of events.keyup) f(e);
 }
 
 onkeydown = e => {
-    keymap[e.key] = true;
+    Input.keymap[e.key] = true;
     // handle any key-held-down inputs
 	for (let f of events.keydown) f(e);
 }
@@ -173,23 +195,23 @@ ontouchstart = e => {
 		 */
 		let touch = {};
 		touch.down = true;
-		touch.start = adjustMousePosition(e.touches[i].clientX, e.touches[i].clientY);
+		touch.start = Utility.adjustMousePosition(e.touches[i].clientX, e.touches[i].clientY);
 		touch.path = [touch.start.copy()];
 		touch.identifier = e.touches[i].identifier;
-		let previousTouch = Mouse.touches.filter(x => x.identifier == touch.identifier);
+		let previousTouch = Input.mouse.touches.filter(x => x.identifier == touch.identifier);
 		if (previousTouch[0]) {
-			Mouse.touches[Mouse.touches.indexOf(previousTouch[0])] = touch;
+			Input.mouse.touches[Input.mouse.touches.indexOf(previousTouch[0])] = touch;
 		} else {
-			Mouse.touches.push(touch);
+			Input.mouse.touches.push(touch);
 		}
 		for (let f of events.touchstart) f(e, e.touches[i]);
 	}
 }
 ontouchmove = e => {
 	for (let i=0; i < e.changedTouches.length; i++) {
-		Mouse.touches.forEach(x => {
+		Input.mouse.touches.forEach(x => {
 			if (e.changedTouches[i].identifier == x.identifier) {
-				let pos = adjustMousePosition(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
+				let pos = Utility.adjustMousePosition(e.changedTouches[i].clientX, e.changedTouches[i].clientY);
 				x.path.push(pos.copy());
 			}
 		})
@@ -198,9 +220,9 @@ ontouchmove = e => {
 }
 ontouchcancel = e => {
 	for (let i=0; i<e.changedTouches.length; i++) {
-		for (let j=Mouse.touches.length-1; j>=0; j--) {
-			if (e.changedTouches[i].identifier == Mouse.touches[j].identifier) {
-				Mouse.touches[j].down = false;
+		for (let j=Input.mouse.touches.length-1; j>=0; j--) {
+			if (e.changedTouches[i].identifier == Input.mouse.touches[j].identifier) {
+				Input.mouse.touches[j].down = false;
 			}
 		}
 		for (let f of events.touchstart) f(e, e.changedTouches[i]);
@@ -208,9 +230,9 @@ ontouchcancel = e => {
 }
 ontouchend = e => {
 	for (let i=0; i<e.changedTouches.length; i++) {
-		for (let j=Mouse.touches.length-1; j>=0; j--) {
-			if (e.changedTouches[i].identifier == Mouse.touches[j].identifier) {
-				Mouse.touches[j].down = false;
+		for (let j=Input.mouse.touches.length-1; j>=0; j--) {
+			if (e.changedTouches[i].identifier == Input.mouse.touches[j].identifier) {
+				Input.mouse.touches[j].down = false;
 			}
 		}
 		for (let f of events.touchstart) f(e, e.changedTouches[i]);

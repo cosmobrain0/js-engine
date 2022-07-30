@@ -21,7 +21,7 @@ const UI_RENDERERS = {};
 		 */
 		intersects(position) {
 			let pos = this.parent.globalPosition;
-			return inRange(position.x, pos.x, pos.x+this.size.x) && inRange(position.y, pos.y, pos.y+this.size.y);
+			return Utility.inRange(position.x, pos.x, pos.x+this.size.x) && Utility.inRange(position.y, pos.y, pos.y+this.size.y);
 		}
 	}
 	
@@ -156,7 +156,7 @@ class Button {
 	}
 
 	get hover() {
-		return this.collider.intersects(Mouse.position);
+		return this.collider.intersects(Input.mouse.position);
 	}
 
 	get globalPosition() {
@@ -196,7 +196,7 @@ class Menu {
 	}
 
 	get hover() {
-		return this.collider.intersects(Mouse.position);
+		return this.collider.intersects(Input.mouse.position);
 	}
 
 	get globalPosition() {

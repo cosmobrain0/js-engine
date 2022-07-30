@@ -1,6 +1,6 @@
 draw = () => {
 	beginPath();
 	fillStyle("#fff");
-	arc(Mouse.position.x, Mouse.position.y, 20, 0, 2*Math.PI);
+	arc(Input.mouse.position.x, Input.mouse.position.y, 20, 0, 2*Math.PI);
 	fill();
 }
