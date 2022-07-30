@@ -21,6 +21,24 @@ ctx.imageSmoothingEnabled = false;
  * @property {Vector[]} path the path the mouse took the last time this button was held down
  * @property {Number?} identifier the identifier for touch input
  */
+class MouseButton {
+	/**
+	 * 
+	 * @param {Vector} start 
+	 * @param {boolean} down 
+	 */
+	constructor(start, down, identifier=null) {
+		this.down = down;
+		this.start = start.copy();
+		this.path = [];
+		this.identifier = identifier;
+	}
+
+	drag() {
+		if (this.path.length) return this.path[this.path.length-1].to(this.start).length();
+		return 0;
+	}
+}
 /**
  * @typedef {Object} Mouse
  * @property {Vector} position the current position
@@ -34,21 +52,11 @@ ctx.imageSmoothingEnabled = false;
  */
 const Mouse = {
 	position: new Vector(0, 0),
-	leftclick: {
-		down: false,
-		start: new Vector(0, 0),
-		path: [],
-	},
-	rightclick: {
-		down: false,
-		start: new Vector(0, 0),
-		path: [],
-	},
+	leftclick: new MouseButton(new Vector(0, 0), false),
+	rightclick: new MouseButton(new Vector(0, 0), false),
 	selected: null,
 	touches: []
 };
-let leftDrag = () => Vector.subtract(Mouse.position, Mouse.leftclickstart);
-let rightDrag = () => Vector.subtract(Mouse.position, Mouse.rightclickstart);
 const UI = new Menu(new Vector(0, 0), null);
 let keymap = {};
 let previousFrameTime, currentFrameTime, lastDeltaTime, deltaTime;
@@ -64,12 +72,16 @@ let calc = () => false;
 let draw = () => false;
 
 let events = {
-	mousemove: [],
-	mousedown: [],
-	mouseup  : [],
-	keydown  : [],
-	keyup    : [],
-	wheel    : []
+	mousemove  : [],
+	mousedown  : [],
+	mouseup    : [],
+	keydown    : [],
+	keyup      : [],
+	wheel      : [],
+	touchstart : [],
+	touchmove  : [],
+	touchcancel: [],
+	touchend   : [],
 }
 
 window.onload = () => {
@@ -110,7 +122,7 @@ onmousemove = e => {
 	Mouse.position = adjustMousePosition(e.clientX, e.clientY);
 	if (Mouse.leftclick.down) Mouse.leftclick.path.push(Mouse.position.copy());
 	if (Mouse.rightclick.down) Mouse.rightclick.path.push(Mouse.position.copy());
-	for (let f of events.mousemove) f();
+	for (let f of events.mousemove) f(e);
 }
 onmousedown = e => {
     if (e.button == 0) {
@@ -125,8 +137,7 @@ onmousedown = e => {
 		Mouse.rightclick.start = Mouse.position.copy();
 		Mouse.rightclick.path = [Mouse.position.copy()];
 	}
-    // handle start-of-press inputs
-	for (let f of events.mousedown) f();
+	for (let f of events.mousedown) f(e);
 }
 onmouseup = e => {
     if (e.button == 0) {
@@ -134,26 +145,25 @@ onmouseup = e => {
 		UI.update();
 	}
     else if (e.button == 2) Mouse.rightclick.down = false;
-    // handle end-of-press inputs
-	for (let f of events.mouseup) f();
+	for (let f of events.mouseup) f(e);
 }
 oncontextmenu = e => e.preventDefault(); // custom context menus?
 
 onkeyup = e => {
     keymap[e.key] = false;
     // handle any one-time-per-key-press inputs
-	for (let f of events.keyup) f(e.key);
+	for (let f of events.keyup) f(e);
 }
 
 onkeydown = e => {
     keymap[e.key] = true;
     // handle any key-held-down inputs
-	for (let f of events.keydown) f(e.key);
+	for (let f of events.keydown) f(e);
 }
 
 onwheel = e => {
     // e.deltaY
-	for (let f of events.wheel) f(e.deltaY);
+	for (let f of events.wheel) f(e);
 }
 
 ontouchstart = e => {
@@ -172,6 +182,7 @@ ontouchstart = e => {
 		} else {
 			Mouse.touches.push(touch);
 		}
+		for (let f of events.touchstart) f(e, e.touches[i]);
 	}
 }
 ontouchmove = e => {
@@ -182,6 +193,7 @@ ontouchmove = e => {
 				x.path.push(pos.copy());
 			}
 		})
+		for (let f of events.touchstart) f(e, e.changedTouches[i]);
 	}
 }
 ontouchcancel = e => {
@@ -191,6 +203,7 @@ ontouchcancel = e => {
 				Mouse.touches[j].down = false;
 			}
 		}
+		for (let f of events.touchstart) f(e, e.changedTouches[i]);
 	}
 }
 ontouchend = e => {
@@ -200,5 +213,6 @@ ontouchend = e => {
 				Mouse.touches[j].down = false;
 			}
 		}
+		for (let f of events.touchstart) f(e, e.changedTouches[i]);
 	}
 }
