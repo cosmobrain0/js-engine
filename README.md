@@ -1,6 +1,6 @@
 # js-engine
 A basic work-in-progress 2D pure JS Game Engine.  
-> **Note**: This documentation is incomplete.  
+> **Note**: This documentation is incomplete, and some parts are out of date.  
 # Contents
 [Basic Usage](#basic-usage)  
 [Event Handling](#event-handling)  
@@ -20,7 +20,7 @@ include all files in [`engine`](js/engine/) in your HTML file before any other c
 <script src="js/engine/setup.js"></script>
 <script src="js/engine/globals.js"></script>
 ```
-the files outside of `engine` are not required.
+the files outside of `js/engine` are not required. `js/engine/globals.js` is also not required.  
 redefine the functions `init`, `calc` and `draw` to suit your needs. `init` is run once when the page has loaded (resources like audio and images may not be ready yet. A future update will deal with resource loading.) `calc` is run once every frame (while the game is not paused), and `draw` is run *at least* once every frame. Right now, `draw` is always called once every frame after `calc`, but in future updates `draw` may be called multiple times between `calc` or before `calc`, at any point in time.  
 > **Note**: `init`, `calc` and `draw` have already been declared, so you can't use `let` or a *function statement* to redefine them.
 > Use *arrow function syntax* instead (e.g. `init = () => { /* function body here */ }`) or a *function expression* (e.g. `init = function() { /* function body goes here */ }`)
@@ -80,9 +80,4 @@ every `MouseButton` represents a mouse button or touchscreen input and has the f
 
 # Planned Updates  
 These are in no particular order.
-* Event handling functions should be given all event info
-* Touch based event handlers
 * Level / Scene system and transition system
-* Namespaces to avoid polluting the global scope
-* Confirming that this engine works even if `js/engine/globals.js` is not included
-* Giving `MouseButton`s a `drag()` property which returns a vector (this distance travelled while held) (and removing `leftDrag()` and `rightDrag()`)
