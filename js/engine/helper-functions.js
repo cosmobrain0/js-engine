@@ -35,11 +35,12 @@ const Utility = {
         let height = window.innerHeight;
         if (width / Canvas.width * Canvas.height > height) width = Math.floor(height / Canvas.height * Canvas.width);
         else height = Math.floor(width / Canvas.width * Canvas.height);
-        c.width = width;
-        c.height = height;
+        c.width = Canvas.width;
+        c.height = Canvas.height;
+        c.style.width = `${floor(width)}px`;
+        c.style.height = `${floor(height)}px`;
         c.style.left = `${(window.innerWidth - width) / 2}px`;
         c.style.top = `${(window.innerHeight - height) / 2}px`;
-        ctx.scale(width / Canvas.width, height / Canvas.height);
     },
 
     /**
