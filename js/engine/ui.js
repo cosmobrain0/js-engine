@@ -70,16 +70,16 @@ const UI_RENDERERS = {};
 	
 		render() {
 			let position = this.parent.globalPosition;
-			ctx.fillStyle = this.bgcolour;
-			ctx.fillRect(position.x, position.y, this.width, this.height);
+			Canvas.ctx.fillStyle = this.bgcolour;
+			Canvas.ctx.fillRect(position.x, position.y, this.width, this.height);
 			if (this.parent.hover) {
-				ctx.fillStyle = this.hoverbg;
-				ctx.fillRect(position.x, position.y, this.width, this.height);
+				Canvas.ctx.fillStyle = this.hoverbg;
+				Canvas.ctx.fillRect(position.x, position.y, this.width, this.height);
 			}
-			ctx.fillStyle = this.txtcolour;
-			ctx.font = this.font;
-			let textDetails = ctx.measureText(this.text);
-			ctx.fillText(this.text, position.x-textDetails.width/2 + this.width/2, position.y+(textDetails.actualBoundingBoxAscent+textDetails.actualBoundingBoxDescent)/2 + this.height/2);
+			Canvas.ctx.fillStyle = this.txtcolour;
+			Canvas.ctx.font = this.font;
+			let textDetails = Canvas.ctx.measureText(this.text);
+			Canvas.ctx.fillText(this.text, position.x-textDetails.width/2 + this.width/2, position.y+(textDetails.actualBoundingBoxAscent+textDetails.actualBoundingBoxDescent)/2 + this.height/2);
 		}
 	}
 	
@@ -106,20 +106,20 @@ const UI_RENDERERS = {};
 	
 		render() {
 			let position = this.parent.globalPosition;
-			ctx.fillStyle = this.bgcolour;
-			ctx.beginPath();
-			ctx.arc(position.x, position.y, this.radius, 0, 2*Math.PI);
-			ctx.fill();
+			Canvas.ctx.fillStyle = this.bgcolour;
+			Canvas.ctx.beginPath();
+			Canvas.ctx.arc(position.x, position.y, this.radius, 0, 2*Math.PI);
+			Canvas.ctx.fill();
 			if (this.parent.hover) {
-				ctx.fillStyle= this.hoverbg;
-				ctx.beginPath();
-				ctx.arc(position.x, position.y, this.radius, 0, 2*Math.PI);
-				ctx.fill();
+				Canvas.ctx.fillStyle= this.hoverbg;
+				Canvas.ctx.beginPath();
+				Canvas.ctx.arc(position.x, position.y, this.radius, 0, 2*Math.PI);
+				Canvas.ctx.fill();
 			}
-			ctx.fillStyle = this.txtcolour;
-			ctx.font = this.font;
-			let textDetails = ctx.measureText(this.text);
-			ctx.fillText(this.text, position.x-textDetails.width/2, position.y+(textDetails.actualBoundingBoxAscent+textDetails.actualBoundingBoxDescent)/2);
+			Canvas.ctx.fillStyle = this.txtcolour;
+			Canvas.ctx.font = this.font;
+			let textDetails = Canvas.ctx.measureText(this.text);
+			Canvas.ctx.fillText(this.text, position.x-textDetails.width/2, position.y+(textDetails.actualBoundingBoxAscent+textDetails.actualBoundingBoxDescent)/2);
 		}
 	}
 
