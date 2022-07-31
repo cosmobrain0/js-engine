@@ -19,9 +19,9 @@ const Utility = {
      * @returns {Vector} the position of the mouse on canvas
      */
     adjustMousePosition: (x, y) => {
-        let position = new Vector(x - (window.innerWidth - c.width) / 2, y - (window.innerHeight - c.height) / 2);
-        position.x /= c.width / CANVASWIDTH;
-        position.y /= c.height / CANVASHEIGHT;
+        let position = new Vector(x - (window.innerWidth - Canvas.c.width) / 2, y - (window.innerHeight - Canvas.c.height) / 2);
+        position.x /= Canvas.c.width / Canvas.width;
+        position.y /= Canvas.c.height / Canvas.height;
         // position.calculatePolar();
         return position;
     },
@@ -33,13 +33,13 @@ const Utility = {
     adjustSize: () => {
         let width = window.innerWidth;
         let height = window.innerHeight;
-        if (width / CANVASWIDTH * CANVASHEIGHT > height) width = Math.floor(height / CANVASHEIGHT * CANVASWIDTH);
-        else height = Math.floor(width / CANVASWIDTH * CANVASHEIGHT);
-        c.width = width;
-        c.height = height;
-        c.style.left = `${(window.innerWidth - width) / 2}px`;
-        c.style.top = `${(window.innerHeight - height) / 2}px`;
-        ctx.scale(width / CANVASWIDTH, height / CANVASHEIGHT);
+        if (width / Canvas.width * Canvas.height > height) width = Math.floor(height / Canvas.height * Canvas.width);
+        else height = Math.floor(width / Canvas.width * Canvas.height);
+        Canvas.c.width = width;
+        Canvas.c.height = height;
+        Canvas.c.style.left = `${(window.innerWidth - width) / 2}px`;
+        Canvas.c.style.top = `${(window.innerHeight - height) / 2}px`;
+        Canvas.ctx.scale(width / Canvas.width, height / Canvas.height);
     },
 
     /**
@@ -147,10 +147,10 @@ const Utility = {
      * @param {boolean?} shouldStroke 
      */
     circle: (position, r, shouldFill=false, shouldStroke=false) => {
-        ctx.beginPath();
-        ctx.arc(position.x, position.y, r, 0, 2*PI);
-        if (shouldFill) ctx.fill();
-        if (shouldStroke) ctx.stroke();
+        Canvas.ctx.beginPath();
+        Canvas.ctx.arc(position.x, position.y, r, 0, 2*PI);
+        if (shouldFill) Canvas.ctx.fill();
+        if (shouldStroke) Canvas.ctx.stroke();
     },
 
     randomPointOnRectangle: (x, y, width, height) => {
