@@ -30,16 +30,16 @@ const Utility = {
      * Adjusts the size of the canvas to fill the screen
      * while maintaing the same aspect ratio (defined by CANVASWIDTH and CANVASHEIGHT)
      */
-    adjustSize: () => {
+    adjustSize: (c, ctx) => {
         let width = window.innerWidth;
         let height = window.innerHeight;
         if (width / Canvas.width * Canvas.height > height) width = Math.floor(height / Canvas.height * Canvas.width);
         else height = Math.floor(width / Canvas.width * Canvas.height);
-        Canvas.c.width = width;
-        Canvas.c.height = height;
-        Canvas.c.style.left = `${(window.innerWidth - width) / 2}px`;
-        Canvas.c.style.top = `${(window.innerHeight - height) / 2}px`;
-        Canvas.ctx.scale(width / Canvas.width, height / Canvas.height);
+        c.width = width;
+        c.height = height;
+        c.style.left = `${(window.innerWidth - width) / 2}px`;
+        c.style.top = `${(window.innerHeight - height) / 2}px`;
+        ctx.scale(width / Canvas.width, height / Canvas.height);
     },
 
     /**

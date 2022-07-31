@@ -58,16 +58,24 @@ const Time = {
 	currentFrameTime: null,
 	lastDeltaTime: null,
 	deltaTime: null,
-	paused: false
+	paused: false,
+	pause: () => {
+		Time.paused = true;
+		if (Scene.currentScene) Scene.currentScene.pause();
+	},
+	unpause: () => {
+		Time.paused = false;
+		if (Scene.currentScene) Scene.currentScene.cont();
+	},
+	togglePause: () => {
+		if (Time.paused) Time.unpause();
+		else Time.pause();
+	}
 };
 /**
  * @type {Matter.Engine}
  */
 let physicsEngine; // physics engine
-/**
- * @type {Scene?}
- */
-let currentScene;
 
 window.onload = () => {
 	physicsEngine = Matter.Engine.create();
@@ -92,12 +100,30 @@ const main = (t) => {
 			totalTimeDone += currentX;
 			previousX = currentX;
 		}
-		if (currentScene) currentScene.calc(currentScene);
+		if (!Scene.currentTransition && Scene.currentScene) Scene.currentScene.calc(Scene.currentScene);
+		if (Scene.currentTransition) {
+			Scene.transitionFrom.calc(Scene.transitionFrom);
+			Scene.transitioningTo.calc(Scene.transitioningTo);
+			Scene.currentTransition.time += Time.deltaTime;
+		}
 	}
 	Time.previousFrameTime = Time.currentFrameTime;
     Canvas.ctx.clearRect(0, 0, Canvas.c.width, Canvas.c.height);
-    Utility.adjustSize();
-	if (currentScene) currentScene.draw(currentScene, Canvas.ctx);
+    Utility.adjustSize(Canvas.c, Canvas.ctx);
+	if (!Scene.currentTransition && Scene.currentScene) Scene.currentScene.draw(Scene.currentScene, Canvas.ctx);
 	UI.draw();
+	if (Scene.currentTransition) {
+		Utility.adjustSize(Scene.currentTransition.startCanvas, Scene.currentTransition.startContext);
+		Utility.adjustSize(Scene.currentTransition.endCanvas, Scene.currentTransition.endContext);
+		Scene.transitionFrom.draw(Scene.transitionFrom, Scene.currentTransition.startContext);
+        Scene.transitioningTo.draw(Scene.transitioningTo, Scene.currentTransition.endContext);
+		let transitionComplete = Scene.currentTransition.handler(Scene.transitionFrom, Scene.transitioningTo, Scene.currentTransition, Canvas.ctx);
+		if (transitionComplete) {
+			// Scene.transitionFrom.pause(Scene.transitionFrom);
+			// Scene.transitionFrom.end(Scene.transitionFrom);
+			// Scene.currentScene = Scene.trans
+			Scene.immediateLoad(Scene.transitioningTo);
+		}
+	}
     requestAnimationFrame(main);
 }
